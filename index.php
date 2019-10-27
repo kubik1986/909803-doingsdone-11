@@ -5,6 +5,27 @@ $show_complete_tasks = rand(0, 1);
 // id текущего проекта
 $current_project_id = null;
 
+/**
+ * Подсчитывает количество задач для указанного проекта.
+ *
+ * @param array  $tasks         Массив задач
+ * @param string $project_title Название проекта
+ *
+ * @return int Количестыо задач
+ */
+function count_number_of_tasks($tasks, $project_title)
+{
+    $count = 0;
+
+    foreach ($tasks as $task) {
+        if ($task['project'] === $project_title) {
+            ++$count;
+        }
+    }
+
+    return $count;
+}
+
 $projects = [
     [
         'id' => 1,
@@ -117,7 +138,7 @@ $tasks = [
                             <a class="main-navigation__list-item-link"
                             <?=($project['id'] === $current_project_id) ? '' : " href=\"/?project_id={$project['id']}\""; ?>
                             ><?=$project['title']; ?></a>
-                            <span class="main-navigation__list-item-count">0</span>
+                            <span class="main-navigation__list-item-count"><?=count_number_of_tasks($tasks, $project['title']); ?></span>
                         </li>
                         <?php endforeach; ?>
                     </ul>
@@ -153,7 +174,7 @@ $tasks = [
                 <table class="tasks">
                     <?php foreach ($tasks as $task): ?>
                         <?php
-                        if ($show_complete_tasks && $task['is_completed']) {
+                        if (!$show_complete_tasks && $task['is_completed']) {
                             continue;
                         }
                         ?>
