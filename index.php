@@ -174,7 +174,7 @@ $tasks = [
                 <table class="tasks">
                     <?php foreach ($tasks as $task): ?>
                         <?php
-                        if ($show_complete_tasks && $task['is_completed']) {
+                        if (!$show_complete_tasks && $task['is_completed']) {
                             continue;
                         }
                         ?>
