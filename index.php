@@ -134,11 +134,11 @@ $tasks = [
                 <nav class="main-navigation">
                     <ul class="main-navigation__list">
                         <?php foreach ($projects as $project): ?>
-                        <li class="main-navigation__list-item<?=($project['id'] === $current_project_id) ? ' main-navigation__list-item--active' : ''; ?>">
+                        <li class="main-navigation__list-item <?= ($project['id'] === $current_project_id) ? 'main-navigation__list-item--active' : ''; ?>">
                             <a class="main-navigation__list-item-link"
-                            <?=($project['id'] === $current_project_id) ? '' : " href=\"/?project_id={$project['id']}\""; ?>
-                            ><?=$project['title']; ?></a>
-                            <span class="main-navigation__list-item-count"><?=count_number_of_tasks($tasks, $project['title']); ?></span>
+                            <?= ($project['id'] === $current_project_id) ? '' : "href=\"/?project_id={$project['id']}\""; ?>
+                            ><?= htmlspecialchars($project['title']); ?></a>
+                            <span class="main-navigation__list-item-count"><?= count_number_of_tasks($tasks, $project['title']); ?></span>
                         </li>
                         <?php endforeach; ?>
                     </ul>
@@ -166,7 +166,7 @@ $tasks = [
                     </nav>
 
                     <label class="checkbox">
-                        <input class="checkbox__input visually-hidden show_completed" type="checkbox" <?=$show_complete_tasks ? ' checked' : ''; ?>>
+                        <input class="checkbox__input visually-hidden show_completed" type="checkbox" <?= $show_complete_tasks ? 'checked' : ''; ?>>
                         <span class="checkbox__text">Показывать выполненные</span>
                     </label>
                 </div>
@@ -178,19 +178,19 @@ $tasks = [
                             continue;
                         }
                         ?>
-                        <tr class="tasks__item task<?=$task['is_completed'] ? ' task--completed' : ''; ?>">
+                        <tr class="tasks__item task <?= $task['is_completed'] ? 'task--completed' : ''; ?>">
                             <td class="task__select">
                                 <label class="checkbox task__checkbox">
-                                    <input class="checkbox__input visually-hidden task__checkbox" type="checkbox" value="<?=$task['id']; ?>"
-                                    <?=$task['is_completed'] ? ' checked' : ''; ?>>
-                                    <span class="checkbox__text"><?=$task['title']; ?></span>
+                                    <input class="checkbox__input visually-hidden task__checkbox" type="checkbox" value="<?= $task['id']; ?>"
+                                    <?= $task['is_completed'] ? 'checked' : ''; ?>>
+                                    <span class="checkbox__text"><?= htmlspecialchars($task['title']); ?></span>
                                 </label>
                             </td>
                             <td class="task__file">
                                 <!-- <a class="download-link" href="#">Home.psd</a> -->
                             </td>
                             <td class="task__date">
-                                <?=empty($task['deadline']) ? '' : $task['deadline']; ?>
+                                <?= empty($task['deadline']) ? '' : htmlspecialchars($task['deadline']); ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>
