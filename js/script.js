@@ -9,7 +9,7 @@ if ($checkbox.length) {
     var searchParams = new URLSearchParams(window.location.search);
     searchParams.set('show_completed', is_checked);
 
-    window.location = '/index.php?' + searchParams.toString();
+    window.location = '/?' + searchParams.toString();
   });
 }
 

@@ -6,7 +6,7 @@
             <?php foreach ($projects as $project): ?>
             <li class="main-navigation__list-item <?= ($project['id'] === $current_project_id) ? 'main-navigation__list-item--active' : ''; ?>">
                 <a class="main-navigation__list-item-link"
-                <?= ($project['id'] === $current_project_id) ? '' : "href=\"/?project_id={$project['id']}&show_completed={$show_completed_tasks}\""; ?>
+                <?= ($project['id'] === $current_project_id) ? '' : 'href="/?'.build_query(['project_id' => $project['id']]).'"'; ?>
                 ><?= htmlspecialchars($project['title']); ?></a>
                 <span class="main-navigation__list-item-count"><?= count_number_of_tasks($tasks, $project['title']); ?></span>
             </li>
