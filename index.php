@@ -8,6 +8,13 @@ $show_completed_tasks = isset($_GET['show_completed']) ? intval($_GET['show_comp
 // id текущего проекта
 $current_project_id = isset($_GET['project_id']) ? intval($_GET['project_id']) : 0;
 
+// фильтр задач
+$filters = $config['filters'];
+$current_filter = isset($_GET['filter']) ? $_GET['filter'] : array_keys($filters)[0];
+if (!array_key_exists($current_filter, $filters)) {
+    $current_filter = array_keys($filters)[0];
+}
+
 // Массив проектов
 $projects = [
     [
@@ -37,7 +44,7 @@ $tasks = [
     [
         'id' => 1,
         'title' => 'Собеседование в IT компании',
-        'deadline' => '01.12.2019',
+        'deadline' => date('d.m.Y', strtotime('tomorrow')),
         'project' => 'Работа',
         'is_completed' => false,
     ],
@@ -51,7 +58,7 @@ $tasks = [
     [
         'id' => 3,
         'title' => 'Сделать задание первого раздела',
-        'deadline' => '21.12.2019',
+        'deadline' => date('d.m.Y', strtotime('yesterday')),
         'project' => 'Учеба',
         'is_completed' => true,
     ],
@@ -82,6 +89,8 @@ $page_content = include_template('main.php', [
     'projects' => $projects,
     'tasks' => $tasks,
     'current_project_id' => $current_project_id,
+    'filters' => $filters,
+    'current_filter' => $current_filter,
     'show_completed_tasks' => $show_completed_tasks,
 ]);
 $layout_content = include_template('layout.php', [

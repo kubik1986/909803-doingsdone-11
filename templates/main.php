@@ -16,10 +16,9 @@
 
     <div class="tasks-controls">
         <nav class="tasks-switch">
-            <a href="/" class="tasks-switch__item tasks-switch__item--active">Все задачи</a>
-            <a href="/" class="tasks-switch__item">Повестка дня</a>
-            <a href="/" class="tasks-switch__item">Завтра</a>
-            <a href="/" class="tasks-switch__item">Просроченные</a>
+            <?php foreach ($filters as $key => $value): ?>
+            <a <?= ($key === $current_filter) ? '' : 'href="/?'.build_query(['filter' => $key]).'"'; ?> class="tasks-switch__item<?= ($key === $current_filter) ? ' tasks-switch__item--active' : ''; ?>"><?= $value; ?></a>
+            <?php endforeach; ?>
         </nav>
 
         <label class="checkbox">
@@ -35,7 +34,7 @@
                 continue;
             }
             ?>
-            <tr class="tasks__item task <?= $task['is_completed'] ? 'task--completed' : ''; ?>">
+            <tr class="tasks__item task<?= $task['is_completed'] ? ' task--completed' : ''; ?><?= (!$task['is_completed'] && check_deadline_approach($task['deadline'])) ? ' task--important' : ''; ?>">
                 <td class="task__select">
                     <label class="checkbox task__checkbox">
                         <input class="checkbox__input visually-hidden task__checkbox" type="checkbox" value="<?= $task['id']; ?>"
