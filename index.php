@@ -2,6 +2,11 @@
 
 require_once 'init.php';
 
+if (empty($user)) {
+    header('Location: guest.php');
+    exit();
+}
+
 // показывать или нет выполненные задачи
 $show_completed_tasks = isset($_GET['show_completed']) ? intval($_GET['show_completed']) : 0;
 
