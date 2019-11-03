@@ -85,7 +85,7 @@ function check_deadline_approach(?string $deadline_date, int $max_hours_to_deadl
  *
  * @return string Строка запроса
  */
-function build_query(array $new_params)
+function build_query(array $new_params): string
 {
     $params = $_GET;
 

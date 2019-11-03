@@ -2,6 +2,11 @@
 
 require_once 'init.php';
 
+if (empty($user)) {
+    header('Location: guest.php');
+    exit();
+}
+
 // показывать или нет выполненные задачи
 $show_completed_tasks = isset($_GET['show_completed']) ? intval($_GET['show_completed']) : 0;
 
@@ -47,6 +52,8 @@ $tasks = [
         'deadline' => date('d.m.Y', strtotime('tomorrow')),
         'project' => 'Работа',
         'is_completed' => false,
+        'file_link' => null,
+        'file_name' => null,
     ],
     [
         'id' => 2,
@@ -54,6 +61,8 @@ $tasks = [
         'deadline' => '25.12.2019',
         'project' => 'Работа',
         'is_completed' => false,
+        'file_link' => 'user-2-fgfgfjjh65ggf.pdf',
+        'file_name' => 'Задание.pdf',
     ],
     [
         'id' => 3,
@@ -61,6 +70,8 @@ $tasks = [
         'deadline' => date('d.m.Y', strtotime('yesterday')),
         'project' => 'Учеба',
         'is_completed' => true,
+        'file_link' => null,
+        'file_name' => null,
     ],
     [
         'id' => 4,
@@ -68,6 +79,8 @@ $tasks = [
         'deadline' => '22.12.2019',
         'project' => 'Входящие',
         'is_completed' => false,
+        'file_link' => null,
+        'file_name' => null,
     ],
     [
         'id' => 5,
@@ -75,6 +88,8 @@ $tasks = [
         'deadline' => null,
         'project' => 'Домашние дела',
         'is_completed' => false,
+        'file_link' => null,
+        'file_name' => null,
     ],
     [
         'id' => 6,
@@ -82,6 +97,8 @@ $tasks = [
         'deadline' => null,
         'project' => 'Домашние дела',
         'is_completed' => false,
+        'file_link' => null,
+        'file_name' => null,
     ],
 ];
 
@@ -91,6 +108,7 @@ $page_content = include_template('main.php', [
     'current_project_id' => $current_project_id,
     'filters' => $filters,
     'current_filter' => $current_filter,
+    'file_path' => $config['user_files_path'],
     'show_completed_tasks' => $show_completed_tasks,
 ]);
 $layout_content = include_template('layout.php', [
