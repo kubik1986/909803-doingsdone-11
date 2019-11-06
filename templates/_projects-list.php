@@ -8,7 +8,7 @@
                 <a class="main-navigation__list-item-link"
                 <?= ($project['id'] === $current_project_id) ? '' : 'href="/?'.build_query(['project_id' => $project['id']]).'"'; ?>
                 ><?= htmlspecialchars($project['title']); ?></a>
-                <span class="main-navigation__list-item-count"><?= count_number_of_tasks($tasks, $project['title']); ?></span>
+                <span class="main-navigation__list-item-count"><?= $project['tasks_count']; ?></span>
             </li>
             <?php endforeach; ?>
         </ul>
