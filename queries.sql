@@ -107,24 +107,28 @@ INSERT INTO tasks (title, adding_date, deadline, is_completed, file_link, file_n
 -- Получает список всех проектов одного пользователя
 SELECT id, title
   FROM projects
-  WHERE author_id = 1;
+  WHERE author_id = 1
+  ORDER BY title;
 
 -- Получает список всех проектов одного пользователя с подсчетом количества задач
 SELECT p.id, p.title, COUNT(t.id) AS tasks_count
   FROM projects p
   LEFT JOIN tasks t ON t.project_id = p.id
   WHERE p.author_id = 1
-  GROUP BY p.id;
+  GROUP BY p.id
+  ORDER BY p.title;
 
 -- Получает список всех задач для одного проекта
 SELECT id, title, deadline, is_completed, file_link, file_name, project_id
   FROM tasks
-  WHERE project_id = 1;
+  WHERE project_id = 1
+  ORDER BY deadline IS NULL, deadline ASC;
 
 -- Получает список всех задач для одного пользователя
 SELECT id, title, deadline, is_completed, file_link, file_name, project_id
   FROM tasks
-  WHERE author_id = 1;
+  WHERE author_id = 1
+  ORDER BY deadline IS NULL, deadline ASC;
 
 -- Инвертирует статус выполнения задачи
 UPDATE tasks

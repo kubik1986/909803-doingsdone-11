@@ -26,24 +26,40 @@ function include_template(string $name, array $data = []): string
 }
 
 /**
- * Подсчитывает количество задач для указанного проекта.
+ * Отрисовывает страницу ошибки по указанным HTTP-коду и тексту ошибки.
  *
- * @param array  $tasks         Массив задач
- * @param string $project_title Название проекта
- *
- * @return int Количестыо задач
+ * @param string $http_code  Код состояния HTTP
+ * @param string $message    Текст сообщения об ошибке
+ * @param array  $user       Массив данных пользователя
+ * @param string $page_title Заголовок страницы
  */
-function count_number_of_tasks(array $tasks, string $project_title): int
+function show_error(string $http_code, string $message, array $user, string $page_title): void
 {
-    $count = 0;
-
-    foreach ($tasks as $task) {
-        if ($task['project'] === $project_title) {
-            ++$count;
-        }
-    }
-
-    return $count;
+    $http_codes = [
+        '401' => ['title' => '401 - Требуется авторизация',
+                  'header' => 'HTTP/1.1 401 Unauthorized', ],
+        '403' => ['title' => '403 - Доступ запрещен',
+                  'header' => 'HTTP/1.1 403 Forbidden', ],
+        '404' => ['title' => '404 - Страница не найдена',
+                  'header' => 'HTTP/1.1 404 Not Found', ],
+        '500' => ['title' => '500 - Внутренняя ошибка сервера',
+                  'header' => 'HTTP/1.1 Internal Server Error', ],
+    ];
+    $error_title = isset($http_codes[$http_code]) ? $http_codes[$http_code]['title'] : $http_codes['404']['title'];
+    $header = isset($http_codes[$http_code]) ? $http_codes[$http_code]['header'] : $http_codes['404']['header'];
+    $error = [
+        'title' => $error_title,
+        'message' => $message,
+    ];
+    header($header);
+    $page_content = include_template('error.php', ['error' => $error]);
+    $layout_content = include_template('layout.php', [
+        'title' => $page_title,
+        'content' => $page_content,
+        'user' => $user,
+        'include_scripts' => false,
+    ]);
+    echo $layout_content;
 }
 
 /**
