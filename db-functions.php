@@ -82,6 +82,28 @@ function db_fetch_data(mysqli $link, string $sql, array $data = []): array
 }
 
 /**
+ * Проверяет, существует ли указанный проект (по id или названию) у определенного пользователя.
+ *
+ * @param mysqli $link    Ресурс соединения
+ * @param int    $user_id Идентификатор пользователя
+ * @param array  $where   Ассоциативный массив вида ['ключ_поиска' => 'значение_ключа_поиска'], который определяет, по какому полю будет проходить поиск ('id'|'title')
+ *
+ * @return bool true, если проект существует у пользователя, иначе false
+ */
+function db_is_project_exist(mysqli $link, int $user_id, array $where): bool
+{
+    $selector = key($where);
+    $data = [current($where)];
+    $sql =
+        "SELECT *
+            FROM projects
+            WHERE author_id = $user_id AND $selector = ?";
+    $project = db_fetch_data($link, $sql, $data);
+
+    return count($project) !== 0;
+}
+
+/**
  * Получает список проектов указанного пользователя с подсчетом количества задач в каждом проекте c учетом фильтрации задач по срочности.
  *
  * @param mysqli $link        Ресурс соединения
@@ -127,11 +149,11 @@ function db_get_projects(mysqli $link, int $user_id, string $task_filter): array
  *
  * @return array Массив задач
  */
-function db_get_tasks(mysqli $link, int $user_id, int $project_id, string $filter): array
+function db_get_tasks(mysqli $link, int $user_id, ?int $project_id, string $filter): array
 {
     $data = [$user_id];
     $project_select = '';
-    if ($project_id !== 0) {
+    if (!empty($project_id)) {
         $project_select = 'AND project_id = ?';
         array_push($data, $project_id);
     }

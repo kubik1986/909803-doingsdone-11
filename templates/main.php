@@ -27,6 +27,11 @@
         </label>
     </div>
 
+    <?php if (count($tasks) === 0): ?>
+    <p class="tasks-msg">Задачи не найдены.</p>
+    <?php elseif (!$show_completed_tasks && is_all_tasks_completed($tasks)): ?>
+    <p class="tasks-msg">Невыполненные задачи отсутствуют, выполненные скрыты.</p>
+    <?php else: ?>
     <table class="tasks">
         <?php foreach ($tasks as $task): ?>
             <?php
@@ -53,4 +58,5 @@
             </tr>
         <?php endforeach; ?>
     </table>
+    <?php endif; ?>
 </main>
