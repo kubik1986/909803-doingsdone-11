@@ -8,16 +8,23 @@ if (empty($user)) {
 }
 
 // показывать или нет выполненные задачи
-$show_completed_tasks = isset($_GET['show_completed']) ? intval($_GET['show_completed']) : 0;
+$show_completed_tasks = intval($_GET['show_completed'] ?? 0);
 
 // id текущего проекта
-$current_project_id = isset($_GET['project_id']) ? intval($_GET['project_id']) : 0;
+$current_project_id = isset($_GET['project_id']) ? intval($_GET['project_id']) : null;
 
 // фильтр задач
 $filters = $config['filters'];
-$current_filter = isset($_GET['filter']) ? $_GET['filter'] : array_keys($filters)[0];
-if (!array_key_exists($current_filter, $filters)) {
-    $current_filter = array_keys($filters)[0];
+$current_filter = $_GET['filter'] ?? array_keys($filters)[0];
+if (
+    (
+        !is_null($current_project_id)
+        && !db_is_project_exist($link, $user['id'], ['id' => $current_project_id])
+    )
+    || !array_key_exists($current_filter, $filters)
+) {
+    show_error('404', 'По вашему запросу ничего не найдено.', $user, $config['sitename']);
+    exit();
 }
 
 // Массив проектов
@@ -36,7 +43,7 @@ $page_content = include_template('main.php', [
     'show_completed_tasks' => $show_completed_tasks,
 ]);
 $layout_content = include_template('layout.php', [
-    'title' => 'Дела в порядке',
+    'title' => $config['sitename'],
     'content' => $page_content,
     'user' => $user,
     'include_scripts' => true,
