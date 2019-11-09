@@ -104,29 +104,31 @@ function db_is_project_exist(mysqli $link, int $user_id, array $where): bool
 }
 
 /**
- * Получает список проектов указанного пользователя с подсчетом количества задач в каждом проекте c учетом фильтрации задач по срочности.
+ * Получает список проектов указанного пользователя с подсчетом количества задач в каждом проекте c учетом фильтрации задач по срочности и статуса выполнения.
  *
- * @param mysqli $link        Ресурс соединения
- * @param int    $user_id     Идентификатор пользователя
- * @param string $task_filter Имя фильтра задач
+ * @param mysqli $link                 Ресурс соединения
+ * @param int    $user_id              Идентификатор пользователя
+ * @param string $task_filter          Имя фильтра задач
+ * @param int    $show_completed_tasks Фильтр статуса выполнения задачи: 1 - подсчитывать в том числе выполненные задачи, 0 - не подсчитывать выполненные задачи
  *
  * @return array Массив проектов пользователя
  */
-function db_get_projects(mysqli $link, int $user_id, string $task_filter): array
+function db_get_projects(mysqli $link, int $user_id, string $task_filter = 'all', int $show_completed_tasks = 0): array
 {
+    $task_completed_select = $show_completed_tasks ? '' : 'AND NOT t.is_completed';
     $task_count_select = '';
     switch ($task_filter) {
         case 'today':
-            $task_count_select = 'CASE WHEN t.deadline = CURDATE() THEN 1 ELSE NULL END';
+            $task_count_select = "CASE WHEN (t.deadline = CURDATE() $task_completed_select) THEN 1 ELSE NULL END";
             break;
         case 'tomorrow':
-            $task_count_select = 'CASE WHEN t.deadline = ADDDATE(CURDATE(), INTERVAL 1 DAY) THEN 1 ELSE NULL END';
+            $task_count_select = "CASE WHEN (t.deadline = ADDDATE(CURDATE(), INTERVAL 1 DAY) $task_completed_select) THEN 1 ELSE NULL END";
             break;
         case 'overdue':
             $task_count_select = 'CASE WHEN (t.deadline < CURDATE() AND NOT t.is_completed) THEN 1 ELSE NULL END';
             break;
         default:
-        $task_count_select = 't.id';
+            $task_count_select = "CASE WHEN (t.id $task_completed_select) THEN 1 ELSE NULL END";
     }
     $sql =
         "SELECT p.id, p.title, COUNT($task_count_select) AS tasks_count
