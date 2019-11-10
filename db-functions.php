@@ -82,6 +82,29 @@ function db_fetch_data(mysqli $link, string $sql, array $data = []): array
 }
 
 /**
+ * Добавляет новую запись в БД.
+ *
+ * @param mysqli $link Ресурс соединения
+ * @param string $sql  SQL запрос с плейсхолдерами вместо значений
+ * @param array  $data Данные для вставки на место плейсхолдеров
+ *
+ * @return int Идентификатор добавленной записи
+ */
+function db_insert_data(mysqli $link, string $sql, array $data = []): int
+{
+    $result = [];
+    $stmt = db_get_prepare_stmt($link, $sql, $data);
+    $result = mysqli_stmt_execute($stmt);
+    if ($result) {
+        $result = mysqli_insert_id($link);
+    } else {
+        exit('Произошла ошибка MySQL. Попробуйте повторить позднее или обратитесь к администратору.');
+    }
+
+    return $result;
+}
+
+/**
  * Проверяет, существует ли указанный проект (по id или названию) у определенного пользователя.
  *
  * @param mysqli $link    Ресурс соединения
@@ -104,29 +127,31 @@ function db_is_project_exist(mysqli $link, int $user_id, array $where): bool
 }
 
 /**
- * Получает список проектов указанного пользователя с подсчетом количества задач в каждом проекте c учетом фильтрации задач по срочности.
+ * Получает список проектов указанного пользователя с подсчетом количества задач в каждом проекте c учетом фильтрации задач по срочности и статуса выполнения.
  *
- * @param mysqli $link        Ресурс соединения
- * @param int    $user_id     Идентификатор пользователя
- * @param string $task_filter Имя фильтра задач
+ * @param mysqli $link                 Ресурс соединения
+ * @param int    $user_id              Идентификатор пользователя
+ * @param string $task_filter          Имя фильтра задач
+ * @param int    $show_completed_tasks Фильтр статуса выполнения задачи: 1 - подсчитывать в том числе выполненные задачи, 0 - не подсчитывать выполненные задачи
  *
  * @return array Массив проектов пользователя
  */
-function db_get_projects(mysqli $link, int $user_id, string $task_filter): array
+function db_get_projects(mysqli $link, int $user_id, string $task_filter = 'all', int $show_completed_tasks = 0): array
 {
+    $task_completed_select = $show_completed_tasks ? '' : 'AND NOT t.is_completed';
     $task_count_select = '';
     switch ($task_filter) {
         case 'today':
-            $task_count_select = 'CASE WHEN t.deadline = CURDATE() THEN 1 ELSE NULL END';
+            $task_count_select = "CASE WHEN (t.deadline = CURDATE() $task_completed_select) THEN 1 ELSE NULL END";
             break;
         case 'tomorrow':
-            $task_count_select = 'CASE WHEN t.deadline = ADDDATE(CURDATE(), INTERVAL 1 DAY) THEN 1 ELSE NULL END';
+            $task_count_select = "CASE WHEN (t.deadline = ADDDATE(CURDATE(), INTERVAL 1 DAY) $task_completed_select) THEN 1 ELSE NULL END";
             break;
         case 'overdue':
             $task_count_select = 'CASE WHEN (t.deadline < CURDATE() AND NOT t.is_completed) THEN 1 ELSE NULL END';
             break;
         default:
-        $task_count_select = 't.id';
+            $task_count_select = "CASE WHEN (t.id $task_completed_select) THEN 1 ELSE NULL END";
     }
     $sql =
         "SELECT p.id, p.title, COUNT($task_count_select) AS tasks_count
@@ -178,4 +203,44 @@ function db_get_tasks(mysqli $link, int $user_id, ?int $project_id, string $filt
             ORDER BY deadline IS NULL, deadline ASC";
 
     return db_fetch_data($link, $sql, $data);
+}
+
+/**
+ * Добавляет запись новой задачи в таблицу tasks БД.
+ *
+ * @param mysqli $link Ресурс соединения
+ * @param array  $data Массив данных новой задачи для вставки в запрос
+ *
+ * @return int
+ */
+function db_add_task(mysqli $link, array $data): int
+{
+    $stmt_data = [
+        $data['name'],
+        $data['author_id'],
+        $data['project'],
+    ];
+
+    $deadline_field = empty($data['date']) ? '' : ',deadline';
+    $deadline_placeholder = empty($data['date']) ? '' : ',?';
+    $file_link_field = empty($data['file_link']) ? '' : ',file_link';
+    $file_link_placeholder = empty($data['file_link']) ? '' : ',?';
+    $file_name_field = empty($data['file_name']) ? '' : ',file_name';
+    $file_name_placeholder = empty($data['file_name']) ? '' : ',?';
+
+    if (!empty($data['date'])) {
+        array_push($stmt_data, $data['date']);
+    }
+    if (!empty($data['file_link'])) {
+        array_push($stmt_data, $data['file_link']);
+    }
+    if (!empty($data['file_name'])) {
+        array_push($stmt_data, $data['file_name']);
+    }
+
+    $sql =
+        "INSERT INTO tasks (title, author_id, project_id $deadline_field $file_link_field $file_name_field)
+            VALUES (?, ?, ? $deadline_placeholder $file_link_placeholder $file_name_placeholder)";
+
+    return db_insert_data($link, $sql, $stmt_data);
 }

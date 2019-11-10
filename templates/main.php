@@ -1,8 +1,6 @@
 <?= include_template('_projects-list.php', [
     'projects' => $projects,
-    'tasks' => $tasks,
     'current_project_id' => $current_project_id,
-    'show_completed_tasks' => $show_completed_tasks,
 ]); ?>
 
 <main class="content__main">
