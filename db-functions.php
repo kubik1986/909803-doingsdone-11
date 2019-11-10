@@ -82,6 +82,29 @@ function db_fetch_data(mysqli $link, string $sql, array $data = []): array
 }
 
 /**
+ * Добавляет новую запись в БД.
+ *
+ * @param mysqli $link Ресурс соединения
+ * @param string $sql  SQL запрос с плейсхолдерами вместо значений
+ * @param array  $data Данные для вставки на место плейсхолдеров
+ *
+ * @return int Идентификатор добавленной записи
+ */
+function db_insert_data(mysqli $link, string $sql, array $data = []): int
+{
+    $result = [];
+    $stmt = db_get_prepare_stmt($link, $sql, $data);
+    $result = mysqli_stmt_execute($stmt);
+    if ($result) {
+        $result = mysqli_insert_id($link);
+    } else {
+        exit('Произошла ошибка MySQL. Попробуйте повторить позднее или обратитесь к администратору.');
+    }
+
+    return $result;
+}
+
+/**
  * Проверяет, существует ли указанный проект (по id или названию) у определенного пользователя.
  *
  * @param mysqli $link    Ресурс соединения
@@ -180,4 +203,44 @@ function db_get_tasks(mysqli $link, int $user_id, ?int $project_id, string $filt
             ORDER BY deadline IS NULL, deadline ASC";
 
     return db_fetch_data($link, $sql, $data);
+}
+
+/**
+ * Добавляет запись новой задачи в таблицу tasks БД.
+ *
+ * @param mysqli $link Ресурс соединения
+ * @param array  $data Массив данных новой задачи для вставки в запрос
+ *
+ * @return int
+ */
+function db_add_task(mysqli $link, array $data): int
+{
+    $stmt_data = [
+        $data['name'],
+        $data['author_id'],
+        $data['project'],
+    ];
+
+    $deadline_field = empty($data['date']) ? '' : ',deadline';
+    $deadline_placeholder = empty($data['date']) ? '' : ',?';
+    $file_link_field = empty($data['file_link']) ? '' : ',file_link';
+    $file_link_placeholder = empty($data['file_link']) ? '' : ',?';
+    $file_name_field = empty($data['file_name']) ? '' : ',file_name';
+    $file_name_placeholder = empty($data['file_name']) ? '' : ',?';
+
+    if (!empty($data['date'])) {
+        array_push($stmt_data, $data['date']);
+    }
+    if (!empty($data['file_link'])) {
+        array_push($stmt_data, $data['file_link']);
+    }
+    if (!empty($data['file_name'])) {
+        array_push($stmt_data, $data['file_name']);
+    }
+
+    $sql =
+        "INSERT INTO tasks (title, author_id, project_id $deadline_field $file_link_field $file_name_field)
+            VALUES (?, ?, ? $deadline_placeholder $file_link_placeholder $file_name_placeholder)";
+
+    return db_insert_data($link, $sql, $stmt_data);
 }
