@@ -180,7 +180,7 @@ function db_get_tasks(mysqli $link, int $user_id, ?int $project_id, string $filt
     $project_select = '';
     if (!empty($project_id)) {
         $project_select = 'AND project_id = ?';
-        array_push($data, $project_id);
+        $data[] = $project_id;
     }
     $filter_select = '';
     switch ($filter) {
@@ -229,13 +229,13 @@ function db_add_task(mysqli $link, array $data): int
     $file_name_placeholder = empty($data['file_name']) ? '' : ',?';
 
     if (!empty($data['date'])) {
-        array_push($stmt_data, $data['date']);
+        $stmt_data[] = $data['date'];
     }
     if (!empty($data['file_link'])) {
-        array_push($stmt_data, $data['file_link']);
+        $stmt_data[] = $data['file_link'];
     }
     if (!empty($data['file_name'])) {
-        array_push($stmt_data, $data['file_name']);
+        $stmt_data[] = $data['file_name'];
     }
 
     $sql =
@@ -243,4 +243,21 @@ function db_add_task(mysqli $link, array $data): int
             VALUES (?, ?, ? $deadline_placeholder $file_link_placeholder $file_name_placeholder)";
 
     return db_insert_data($link, $sql, $stmt_data);
+}
+
+/**
+ * Добавляет запись новой проекта в таблицу projects БД.
+ *
+ * @param mysqli $link Ресурс соединения
+ * @param array  $data Массив данных нового проекта для вставки в запрос
+ *
+ * @return int
+ */
+function db_add_project(mysqli $link, array $data): int
+{
+    $sql =
+        'INSERT INTO projects (title, author_id)
+            VALUES (?, ?)';
+
+    return db_insert_data($link, $sql, $data);
 }
