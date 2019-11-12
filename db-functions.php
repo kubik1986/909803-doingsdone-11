@@ -246,7 +246,7 @@ function db_add_task(mysqli $link, array $data): int
 }
 
 /**
- * Добавляет запись новой проекта в таблицу projects БД.
+ * Добавляет запись нового проекта в таблицу projects БД.
  *
  * @param mysqli $link Ресурс соединения
  * @param array  $data Массив данных нового проекта для вставки в запрос

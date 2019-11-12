@@ -54,6 +54,24 @@ function validate_project_id_exists(mysqli $link, int $user_id, int $project_id)
 }
 
 /**
+ * Проверяет, существует ли проект у пользователся по указанному названию.
+ *
+ * @param mysqli $link    Ресурс соединения с БД
+ * @param int    $user_id Идентификатор пользователя
+ * @param string $title   Название проекта
+ *
+ * @return string Строка сообщения об ошибке, если пользователь уже создавал проект с указанным названием
+ */
+function validate_project_title_exists(mysqli $link, int $user_id, string $title): ?string
+{
+    if (db_is_project_exist($link, $user_id, ['title' => $title])) {
+        return 'Проект с таким названием уже существует. Введите новое название';
+    }
+
+    return null;
+}
+
+/**
  * Проверяет корректность даты и ее формата.
  *
  * @param string $date Проверяемое значение
