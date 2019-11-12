@@ -74,6 +74,17 @@ function check_main_page(): bool
 }
 
 /**
+ * Определяет, является ли текущая страница гостевой.
+ *
+ * @return bool true, если текущая страница является гостевой, иначе false
+ */
+function check_guest_page(): bool
+{
+    return isset($_SERVER['REQUEST_URI'])
+                 && ($_SERVER['REQUEST_URI'] === '/guest.php');
+}
+
+/**
  * Определяет, является ли количество часов, оставшихся до определенной даты, меньше либо равно указанному значению.
  *
  * @param string $deadline_date         Дата, до которой вычисляется количество оставшихся часов
