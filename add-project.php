@@ -38,17 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') { // Если была отправл
         ],
     ];
 
-    foreach ($rules as $field => $value) {
-        foreach ($value as $cb => $args) {
-            if (isset($errors[$field])) {
-                break;
-            }
-            $result = $cb(...$args);
-            if ($result) {
-                $errors[$field] = $result;
-            }
-        }
-    }
+    $errors = validate($rules);
 
     if (empty($errors)) { // Если не было ошибок валидации
         $data['author_id'] = $user['id'];

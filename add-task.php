@@ -56,21 +56,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') { // Если была отправл
 
     if (isset($_FILES['file']) && is_uploaded_file($_FILES['file']['tmp_name'])) {
         $rules['file'] = [
-            'validate_file_size' => [$_FILES['file'], $config['max_file_size']],
+            'validate_file_size' => [
+                $_FILES['file'],
+                $config['forms_limits']['max_file_size'],
+            ],
         ];
     }
 
-    foreach ($rules as $field => $value) {
-        foreach ($value as $cb => $args) {
-            if (isset($errors[$field])) {
-                break;
-            }
-            $result = $cb(...$args);
-            if ($result) {
-                $errors[$field] = $result;
-            }
-        }
-    }
+    $errors = validate($rules);
 
     if (empty($errors)) { // Если не было ошибок валидации
         if (isset($_FILES['file']) && is_uploaded_file($_FILES['file']['tmp_name'])) {
