@@ -211,7 +211,7 @@ function db_get_tasks(mysqli $link, int $user_id, ?int $project_id, string $filt
  * @param mysqli $link Ресурс соединения
  * @param array  $data Массив данных новой задачи для вставки в запрос
  *
- * @return int
+ * @return int Идентификатор добавленной записи
  */
 function db_add_task(mysqli $link, array $data): int
 {
@@ -251,13 +251,50 @@ function db_add_task(mysqli $link, array $data): int
  * @param mysqli $link Ресурс соединения
  * @param array  $data Массив данных нового проекта для вставки в запрос
  *
- * @return int
+ * @return int Идентификатор добавленной записи
  */
 function db_add_project(mysqli $link, array $data): int
 {
     $sql =
         'INSERT INTO projects (title, author_id)
             VALUES (?, ?)';
+
+    return db_insert_data($link, $sql, $data);
+}
+
+/**
+ * Получает данные пользователя (по id или email).
+ *
+ * @param mysqli $link  Ресурс соединения
+ * @param array  $where Ассоциативный массив вида ['ключ_поиска' => 'значение_ключа_поиска'], который определяет, по какому полю будет проходить поиск ('id'|'email')
+ *
+ * @return array Массив данных пользователя
+ */
+function db_get_user(mysqli $link, array $where): array
+{
+    $selector = key($where);
+    $data = [current($where)];
+    $sql =
+        "SELECT *
+            FROM users
+            WHERE $selector = ?";
+
+    return db_fetch_data($link, $sql, $data);
+}
+
+/**
+ * Добавляет запись нового проекта в таблицу users БД.
+ *
+ * @param mysqli $link Ресурс соединения
+ * @param mixed  $data Массив данных нового пользователя для вставки в запрос
+ *
+ * @return int Идентификатор добавленной записи
+ */
+function db_add_user(mysqli $link, array $data): int
+{
+    $sql =
+        'INSERT INTO users (email, password, name)
+            VALUES (?, ?, ?)';
 
     return db_insert_data($link, $sql, $data);
 }

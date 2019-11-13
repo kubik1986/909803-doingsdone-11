@@ -21,6 +21,10 @@ function validate(array $rules): array
             }
         }
     }
+
+    return $errors;
+}
+
 /**
  * Проверяет, заполнено ли поле. Значения 0 или '0' считаются валидными.
  *
@@ -144,4 +148,34 @@ function validate_file_size(array $file, int $max_file_size): ?string
     }
 
     return null;
+}
+
+/**
+ * Проверяет, зарегистрирован ли пользователь с указанным e-mail.
+ *
+ * @param mysqli $link  Ресурс соединения с БД
+ * @param string $email Проверяемый e-mail
+ *
+ * @return string Строка сообщения об ошибке, если пользователь с указанным e-mail уже зарегистрирован
+ */
+function validate_email_is_registered(mysqli $link, string $email): ?string
+{
+    $user = db_get_user($link, ['email' => $email]);
+    if (!empty($user)) {
+        return 'Пользователь с указанным e-mail уже зарегистрирован';
+    }
+
+    return null;
+}
+
+/**
+ * Проверяет корректность формата адреса электронной почты.
+ *
+ * @param string $email Проверяемое значение
+ *
+ * @return string Строка сообщения об ошибке, если формат адреса элетронной почты некорректный
+ */
+function validate_email(string $email): ?string
+{
+    return filter_var($email, FILTER_VALIDATE_EMAIL) ? null : 'Некорректный формат адреса электронной почты';
 }
