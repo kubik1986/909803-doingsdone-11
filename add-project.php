@@ -4,7 +4,7 @@ require_once 'init.php';
 require_once 'validation_functions.php';
 
 if (empty($user)) {
-    header('Location: guest.php');
+    show_error('401', 'Добавление проектов доступно только авторизованным пользователям. Пожалуйста, войдите в свой аккаунт, если у вас уже есть учетная запись, или зарегистрируйтесь.', $user, $config['sitename'].': добавление проекта');
     exit();
 }
 
