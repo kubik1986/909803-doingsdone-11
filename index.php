@@ -31,7 +31,7 @@ if (
 $projects = db_get_projects($link, $user['id'], $current_filter, $show_completed_tasks);
 
 // Масив задач
-$tasks = db_get_tasks($link, $user['id'], $current_project_id, $current_filter);
+$tasks = db_get_tasks($link, $user['id'], $current_project_id, $current_filter, $show_completed_tasks);
 
 $page_content = include_template('main.php', [
     'projects' => $projects,

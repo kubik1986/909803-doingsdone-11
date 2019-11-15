@@ -27,16 +27,9 @@
 
     <?php if (count($tasks) === 0): ?>
     <p class="tasks-msg">Задачи не найдены.</p>
-    <?php elseif (!$show_completed_tasks && is_all_tasks_completed($tasks)): ?>
-    <p class="tasks-msg">Невыполненные задачи отсутствуют, выполненные скрыты.</p>
     <?php else: ?>
     <table class="tasks">
         <?php foreach ($tasks as $task): ?>
-            <?php
-            if (!$show_completed_tasks && $task['is_completed']) {
-                continue;
-            }
-            ?>
             <tr class="tasks__item task<?= $task['is_completed'] ? ' task--completed' : ''; ?><?= (!$task['is_completed'] && check_deadline_approach($task['deadline'])) ? ' task--important' : ''; ?>">
                 <td class="task__select">
                     <label class="checkbox task__checkbox">

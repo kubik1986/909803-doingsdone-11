@@ -167,14 +167,15 @@ function db_get_projects(mysqli $link, int $user_id, string $task_filter = 'all'
 /**
  * Получает список задач указанного пользователя с фильтрацией по проекту и срочности.
  *
- * @param mysqli $link       Ресурс соединения
- * @param int    $user_id    Идентификатор пользователя
- * @param int    $project_id Идентификатор проекта
- * @param int    $filter     Имя фильтра срочности задачи
+ * @param mysqli $link                 Ресурс соединения
+ * @param int    $user_id              Идентификатор пользователя
+ * @param int    $project_id           Идентификатор проекта
+ * @param int    $filter               Имя фильтра срочности задачи
+ * @param int    $show_completed_tasks Фильтр статуса выполнения задачи: 1 - показывать выполненные задачи, 0 - не показывать выполненные задачи
  *
  * @return array Массив задач
  */
-function db_get_tasks(mysqli $link, int $user_id, ?int $project_id, string $filter): array
+function db_get_tasks(mysqli $link, int $user_id, ?int $project_id = null, string $filter = 'all', int $show_completed_tasks = 0): array
 {
     $data = [$user_id];
     $project_select = '';
@@ -196,10 +197,11 @@ function db_get_tasks(mysqli $link, int $user_id, ?int $project_id, string $filt
         default:
             $filter_select = '';
     }
+    $is_completed_select = $show_completed_tasks ? '' : 'AND NOT is_completed';
     $sql =
-        "SELECT t.id, t.title, deadline, is_completed, file_link, file_name, project_id
-            FROM tasks t
-            WHERE t.author_id = ? $project_select $filter_select
+        "SELECT id, title, deadline, is_completed, file_link, file_name, project_id
+            FROM tasks
+            WHERE author_id = ? $project_select $filter_select $is_completed_select
             ORDER BY deadline IS NULL, deadline ASC";
 
     return db_fetch_data($link, $sql, $data);
