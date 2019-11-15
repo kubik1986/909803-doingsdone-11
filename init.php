@@ -5,12 +5,9 @@ require_once 'config/db.php';
 require_once 'functions.php';
 require_once 'db-functions.php';
 
-$user = [
-    'id' => 1,
-    'name' => 'John Doe',
-    'email' => 'john_doe@gmail.com',
-    'password' => '$2y$10$Nbn97Bc6Rzdk1POIvmBPcuD14T/FpLa0.DTOclYwebMJcA5uZgWi',
-];
+// Старт сессии
+session_start();
+$user = isset($_SESSION['user']) ? $_SESSION['user'] : [];
 
 // Подключение к БД
 $link = db_connect($db);

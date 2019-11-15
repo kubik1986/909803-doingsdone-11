@@ -167,20 +167,21 @@ function db_get_projects(mysqli $link, int $user_id, string $task_filter = 'all'
 /**
  * Получает список задач указанного пользователя с фильтрацией по проекту и срочности.
  *
- * @param mysqli $link       Ресурс соединения
- * @param int    $user_id    Идентификатор пользователя
- * @param int    $project_id Идентификатор проекта
- * @param int    $filter     Имя фильтра срочности задачи
+ * @param mysqli $link                 Ресурс соединения
+ * @param int    $user_id              Идентификатор пользователя
+ * @param int    $project_id           Идентификатор проекта
+ * @param int    $filter               Имя фильтра срочности задачи
+ * @param int    $show_completed_tasks Фильтр статуса выполнения задачи: 1 - показывать выполненные задачи, 0 - не показывать выполненные задачи
  *
  * @return array Массив задач
  */
-function db_get_tasks(mysqli $link, int $user_id, ?int $project_id, string $filter): array
+function db_get_tasks(mysqli $link, int $user_id, ?int $project_id = null, string $filter = 'all', int $show_completed_tasks = 0): array
 {
     $data = [$user_id];
     $project_select = '';
     if (!empty($project_id)) {
         $project_select = 'AND project_id = ?';
-        array_push($data, $project_id);
+        $data[] = $project_id;
     }
     $filter_select = '';
     switch ($filter) {
@@ -196,10 +197,11 @@ function db_get_tasks(mysqli $link, int $user_id, ?int $project_id, string $filt
         default:
             $filter_select = '';
     }
+    $is_completed_select = $show_completed_tasks ? '' : 'AND NOT is_completed';
     $sql =
-        "SELECT t.id, t.title, deadline, is_completed, file_link, file_name, project_id
-            FROM tasks t
-            WHERE t.author_id = ? $project_select $filter_select
+        "SELECT id, title, deadline, is_completed, file_link, file_name, project_id
+            FROM tasks
+            WHERE author_id = ? $project_select $filter_select $is_completed_select
             ORDER BY deadline IS NULL, deadline ASC";
 
     return db_fetch_data($link, $sql, $data);
@@ -211,7 +213,7 @@ function db_get_tasks(mysqli $link, int $user_id, ?int $project_id, string $filt
  * @param mysqli $link Ресурс соединения
  * @param array  $data Массив данных новой задачи для вставки в запрос
  *
- * @return int
+ * @return int Идентификатор добавленной записи
  */
 function db_add_task(mysqli $link, array $data): int
 {
@@ -229,13 +231,13 @@ function db_add_task(mysqli $link, array $data): int
     $file_name_placeholder = empty($data['file_name']) ? '' : ',?';
 
     if (!empty($data['date'])) {
-        array_push($stmt_data, $data['date']);
+        $stmt_data[] = $data['date'];
     }
     if (!empty($data['file_link'])) {
-        array_push($stmt_data, $data['file_link']);
+        $stmt_data[] = $data['file_link'];
     }
     if (!empty($data['file_name'])) {
-        array_push($stmt_data, $data['file_name']);
+        $stmt_data[] = $data['file_name'];
     }
 
     $sql =
@@ -243,4 +245,58 @@ function db_add_task(mysqli $link, array $data): int
             VALUES (?, ?, ? $deadline_placeholder $file_link_placeholder $file_name_placeholder)";
 
     return db_insert_data($link, $sql, $stmt_data);
+}
+
+/**
+ * Добавляет запись нового проекта в таблицу projects БД.
+ *
+ * @param mysqli $link Ресурс соединения
+ * @param array  $data Массив данных нового проекта для вставки в запрос
+ *
+ * @return int Идентификатор добавленной записи
+ */
+function db_add_project(mysqli $link, array $data): int
+{
+    $sql =
+        'INSERT INTO projects (title, author_id)
+            VALUES (?, ?)';
+
+    return db_insert_data($link, $sql, $data);
+}
+
+/**
+ * Получает данные пользователя (по id или email).
+ *
+ * @param mysqli $link  Ресурс соединения
+ * @param array  $where Ассоциативный массив вида ['ключ_поиска' => 'значение_ключа_поиска'], который определяет, по какому полю будет проходить поиск ('id'|'email')
+ *
+ * @return array Массив данных пользователя
+ */
+function db_get_user(mysqli $link, array $where): array
+{
+    $selector = key($where);
+    $data = [current($where)];
+    $sql =
+        "SELECT *
+            FROM users
+            WHERE $selector = ?";
+
+    return db_fetch_data($link, $sql, $data);
+}
+
+/**
+ * Добавляет запись нового проекта в таблицу users БД.
+ *
+ * @param mysqli $link Ресурс соединения
+ * @param mixed  $data Массив данных нового пользователя для вставки в запрос
+ *
+ * @return int Идентификатор добавленной записи
+ */
+function db_add_user(mysqli $link, array $data): int
+{
+    $sql =
+        'INSERT INTO users (email, password, name)
+            VALUES (?, ?, ?)';
+
+    return db_insert_data($link, $sql, $data);
 }

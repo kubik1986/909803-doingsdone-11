@@ -9,11 +9,11 @@
         <link rel="stylesheet" href="css/flatpickr.min.css">
     </head>
 
-    <body <?= empty($user) ? 'class="body-background"' : ''; ?>>
+    <body <?= check_guest_page() ? 'class="body-background"' : ''; ?>>
         <h1 class="visually-hidden">Дела в порядке</h1>
 
         <div class="page-wrapper">
-            <div class="container<?= empty($user) ? '' : ' container--with-sidebar'; ?>">
+            <div class="container<?= check_guest_page() ? '' : ' container--with-sidebar'; ?>">
                 <header class="main-header">
                     <a <?= check_main_page() ? '' : 'href="/"'; ?>>
                         <img src="img/logo.png" width="153" height="42" alt="Логотип Дела в порядке">
