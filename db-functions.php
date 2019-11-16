@@ -60,20 +60,22 @@ function db_get_prepare_stmt(mysqli $link, string $sql, array $data = []): mysql
 /**
  * Получает записи из БД.
  *
- * @param mysqli $link Ресурс соединения
- * @param string $sql  SQL запрос с плейсхолдерами вместо значений
- * @param array  $data Данные для вставки на место плейсхолдеров
+ * @param mysqli $link      Ресурс соединения
+ * @param string $sql       SQL запрос с плейсхолдерами вместо значений
+ * @param array  $data      Данные для вставки на место плейсхолдеров
+ * @param bool   $fetch_one Параметр, определяющий вид результирующего массива: true - возвращается одномерный ассоциативный массив (одна запись из БД), false - возвращается двумерный ассоциативный массив (несколько записей из БД)
  *
  * @return array Массив записей по результату запроса
  */
-function db_fetch_data(mysqli $link, string $sql, array $data = []): array
+function db_fetch_data(mysqli $link, string $sql, array $data = [], bool $fetch_one = false): array
 {
+    $fetch_func = $fetch_one ? 'mysqli_fetch_array' : 'mysqli_fetch_all';
     $result = [];
     $stmt = db_get_prepare_stmt($link, $sql, $data);
     mysqli_stmt_execute($stmt);
     $res = mysqli_stmt_get_result($stmt);
     if ($res) {
-        $result = mysqli_fetch_all($res, MYSQLI_ASSOC);
+        $result = $fetch_func($res, MYSQLI_ASSOC);
     } else {
         exit('Произошла ошибка MySQL. Попробуйте повторить позднее или обратитесь к администратору.');
     }
@@ -281,11 +283,11 @@ function db_get_user(mysqli $link, array $where): array
             FROM users
             WHERE $selector = ?";
 
-    return db_fetch_data($link, $sql, $data);
+    return db_fetch_data($link, $sql, $data, true);
 }
 
 /**
- * Добавляет запись нового проекта в таблицу users БД.
+ * Добавляет запись данных нового пользователя в таблицу users БД.
  *
  * @param mysqli $link Ресурс соединения
  * @param mixed  $data Массив данных нового пользователя для вставки в запрос

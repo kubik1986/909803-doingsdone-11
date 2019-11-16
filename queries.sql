@@ -1,11 +1,11 @@
 -- Добавляет записи в таблицу пользователей
 INSERT INTO users (name, password, email, reg_date) VALUES
   ('John Doe',
-    '$2y$10$GU4aYHiHdLwsEUkp2v715ekW/n43w9iaby0q6xq04HNCZnLO7n7fy',
+    '$2y$10$q4cDqK2WQKsvSePx2v3ATerOLq2CLNaK9i7ws1Ep1VsmmZeeawWBe',
     'john_doe@gmail.com',
     '2019-10-05 15:05:33'),
   ('Jane Smith',
-    '$2y$10$AykbIgNv6uw10t3Ns68Bae6RkqcPdVSoyNUTVByOIJPRhiDRnSRku',
+    '$2y$10$5lfbBUo8j.JqizhrrEZWi.jYQYE0CVJxM9Qkl46z2Rk.cUoGWZ0D2',
     'jane-smith@yahoo.com',
     '2019-10-28 10:42:17');
 
