@@ -68,6 +68,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') { // Если была отправл
 
     $errors = validate($rules);
 
+    if (empty($data['password']) && !empty($data['old_password'])) {
+        $errors['password'] = 'Чтобы поменять пароль, заполните это поле. Если вы не хотите менять пароль, не заполняйте поле "старый пароль"';
+    }
+
     if (empty($errors)) { // Если не было ошибок валидации
         $user_id = $user['id'];
         $data['user_id'] = $user_id;
