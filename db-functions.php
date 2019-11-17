@@ -122,6 +122,27 @@ function db_insert_data(mysqli $link, string $sql, array $data = []): int
 }
 
 /**
+ * Обновляет запись в БД.
+ *
+ * @param mysqli $link Ресурс соединения
+ * @param string $sql  SQL запрос с плейсхолдерами вместо значений
+ * @param array  $data Данные для вставки на место плейсхолдеров
+ *
+ * @return bool true - данные успешно оновлены, false - данные не обновлены
+ */
+function db_update_data(mysqli $link, string $sql, array $data = []): bool
+{
+    $result = [];
+    $stmt = db_get_prepare_stmt($link, $sql, $data);
+    $result = mysqli_stmt_execute($stmt);
+    if (!$result) {
+        exit('Произошла ошибка MySQL. Попробуйте повторить позднее или обратитесь к администратору.');
+    }
+
+    return $result;
+}
+
+/**
  * Проверяет, существует ли указанный проект (по id или названию) у определенного пользователя.
  *
  * @param mysqli $link    Ресурс соединения
@@ -316,4 +337,22 @@ function db_add_user(mysqli $link, array $data): int
             VALUES (?, ?, ?, ?)';
 
     return db_insert_data($link, $sql, $data);
+}
+
+function db_update_user(mysqli $link, int $user_id, array $data): bool
+{
+    $password_set = '';
+    $stmt_data = [];
+    $stmt_data['name'] = $data['name'];
+    $stmt_data['timezone'] = $data['timezone'];
+    if (!empty($data['password'])) {
+        $password_set = ', password = ?';
+        $stmt_data['password'] = $data['password'];
+    }
+    $sql =
+        "UPDATE users
+            SET name = ?, timezone = ? $password_set
+            WHERE id = $user_id";
+
+    return db_update_data($link, $sql, $stmt_data);
 }

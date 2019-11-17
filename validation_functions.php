@@ -196,3 +196,20 @@ function validate_timezone_id(string $timezone_id, array $timezones): ?string
 
     return null;
 }
+
+/**
+ * Проверяет правильность пароля.
+ *
+ * @param string $password Проверяемый пароль
+ * @param string $hash     Хэш пароля, с которым производится сравнение
+ *
+ * @return string
+ */
+function validate_password(string $password, string $hash): ?string
+{
+    if (!password_verify($password, $hash)) {
+        return 'Неверный пароль';
+    }
+
+    return null;
+}

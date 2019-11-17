@@ -26,7 +26,7 @@
     </div>
 
     <?php if (count($tasks) === 0): ?>
-    <p class="tasks-msg">Задачи не найдены</p>
+    <p class="msg">Задачи не найдены</p>
     <?php else: ?>
     <table class="tasks">
         <?php foreach ($tasks as $task): ?>
