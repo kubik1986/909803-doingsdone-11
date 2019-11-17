@@ -1,12 +1,14 @@
 -- Добавляет записи в таблицу пользователей
-INSERT INTO users (name, password, email, reg_date) VALUES
+INSERT INTO users (name, password, email, timezone, reg_date) VALUES
   ('John Doe',
     '$2y$10$q4cDqK2WQKsvSePx2v3ATerOLq2CLNaK9i7ws1Ep1VsmmZeeawWBe',
     'john_doe@gmail.com',
+    'Asia/Anadyr',
     '2019-10-05 15:05:33'),
   ('Jane Smith',
     '$2y$10$5lfbBUo8j.JqizhrrEZWi.jYQYE0CVJxM9Qkl46z2Rk.cUoGWZ0D2',
     'jane-smith@yahoo.com',
+    'Europe/Kaliningrad',
     '2019-10-28 10:42:17');
 
 -- Добавляет записи в таблицу проектов

@@ -19,7 +19,7 @@
             <select class="form__input form__input--select<?= isset($errors['project']) ? ' form__input--error' : ''; ?>" name="project" id="project">
                 <option value="" selected disabled>Выберите проект</option>
                 <?php foreach ($projects as $project): ?>
-                <option value="<?= $project['id']; ?>" <?= (!empty($data['project']) && intval($data['project']) === $project['id']) ? 'selected' : ''; ?>><?=$project['title']; ?></option>
+                <option value="<?= $project['id']; ?>" <?= (!empty($data['project']) && intval($data['project']) === $project['id']) ? 'selected' : ''; ?>><?= $project['title']; ?></option>
                 <?php endforeach; ?>
             </select>
             <?php if (isset($errors['project'])): ?>

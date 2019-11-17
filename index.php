@@ -27,6 +27,10 @@ if (
     exit();
 }
 
+// Устанавливает временную зону пользователя
+date_default_timezone_set($user['timezone']);
+db_set_time_zone($link, $user['timezone']);
+
 // Массив проектов
 $projects = db_get_projects($link, $user['id'], $current_filter, $show_completed_tasks);
 

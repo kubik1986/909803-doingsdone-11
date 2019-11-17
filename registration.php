@@ -2,6 +2,7 @@
 
 require_once 'init.php';
 require_once 'validation_functions.php';
+require_once 'config/timezones.php';
 
 if (!empty($user)) {
     header('Location: /');
@@ -15,7 +16,7 @@ $errors = [];
 $data = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') { // Если была отправлена форма
-    $fields = ['email', 'password', 'name'];
+    $fields = ['email', 'password', 'name', 'timezone'];
 
     foreach ($fields as $field) {
         if (isset($_POST[$field])) {
@@ -50,6 +51,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') { // Если была отправл
                 $config['forms_limits']['user_name_max_length'],
             ],
         ],
+        'timezone' => [
+            'validate_filled' => [$data['timezone']],
+            'validate_timezone_id' => [
+                $data['timezone'],
+                $timezones,
+            ],
+        ],
     ];
 
     $errors = validate($rules);
@@ -65,6 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') { // Если была отправл
 $page_content = include_template('registration.php', [
     'errors' => $errors,
     'data' => $data,
+    'timezones' => $timezones,
 ]);
 $layout_content = include_template('layout.php', [
     'title' => $config['sitename'].': регистрация',

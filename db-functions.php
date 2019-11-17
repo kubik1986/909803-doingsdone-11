@@ -1,5 +1,21 @@
 <?php
 /**
+ * Устанавливает временную зону для сеанса подключения к БД.
+ *
+ * @param mysqli $link     Ресурс соединения
+ * @param string $timezone Идентификатор временной зоны
+ */
+function db_set_time_zone(mysqli $link, string $timezone): void
+{
+    $sql = "SET time_zone = '".$timezone."'";
+    $result = mysqli_query($link, $sql);
+
+    if (!$result) {
+        exit('Произошла ошибка MySQL. Попробуйте повторить позднее или обратитесь к администратору.');
+    }
+}
+
+/**
  * Создает подключение к сервру MySQL и возвращает идентификатор подключения.
  *
  * @param array $db Массив с параметрами подключения
@@ -10,10 +26,9 @@ function db_connect(array $db): mysqli
 {
     $link = mysqli_connect($db['host'], $db['user'], $db['password'], $db['database']);
     if ($link) {
-        $sql = "SET time_zone = '".$db['timezone']."'";
-        $set_time_zone = mysqli_query($link, $sql);
+        db_set_time_zone($link, $db['timezone']);
     }
-    if (!$link || !$set_time_zone) {
+    if (!$link) {
         exit('Произошла ошибка MySQL. Попробуйте повторить позднее или обратитесь к администратору.');
     }
 
@@ -297,8 +312,8 @@ function db_get_user(mysqli $link, array $where): array
 function db_add_user(mysqli $link, array $data): int
 {
     $sql =
-        'INSERT INTO users (email, password, name)
-            VALUES (?, ?, ?)';
+        'INSERT INTO users (email, password, name, timezone)
+            VALUES (?, ?, ?, ?)';
 
     return db_insert_data($link, $sql, $data);
 }

@@ -227,13 +227,17 @@ a:focus {
   align-items: center;
 }
 
-.user-menu__data p {
-  margin: 3px 0 2px;
-}
-
 .user-menu__data a {
   font-size: 13px;
   color: #9fa4af;
+}
+
+.user-menu__data .user-menu__name {
+  display: block;
+  margin: 3px 0 2px;
+
+  font: inherit;
+  color: inherit;
 }
 
 .user-menu__data a:active {
