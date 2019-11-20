@@ -179,3 +179,37 @@ function validate_email(string $email): ?string
 {
     return filter_var($email, FILTER_VALIDATE_EMAIL) ? null : 'Некорректный формат адреса электронной почты';
 }
+
+/**
+ * Проверяет корректность идентификатора временной зоны.
+ *
+ * @param string $timezone_id Идентификатор временной зоны
+ * @param array  $timezones   Ассоциативный массив доступных временных зон, ключом в котором является идентификатор зоны
+ *
+ * @return string
+ */
+function validate_timezone_id(string $timezone_id, array $timezones): ?string
+{
+    if (!key_exists($timezone_id, $timezones)) {
+        return 'Выберите часовой пояс из списка';
+    }
+
+    return null;
+}
+
+/**
+ * Проверяет правильность пароля.
+ *
+ * @param string $password Проверяемый пароль
+ * @param string $hash     Хэш пароля, с которым производится сравнение
+ *
+ * @return string
+ */
+function validate_password(string $password, string $hash): ?string
+{
+    if (!password_verify($password, $hash)) {
+        return 'Неверный пароль';
+    }
+
+    return null;
+}

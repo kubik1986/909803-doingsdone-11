@@ -27,7 +27,7 @@
             <?php elseif (!empty($errors['authorization'])): ?>
             <p class="error-message"><?= $errors['authorization']; ?></p>
             <?php endif; ?>
-            <input class="button" type="submit" name="submit" value="Войти">
+            <input class="button" type="submit" value="Войти">
         </div>
     </form>
 </main>

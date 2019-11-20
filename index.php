@@ -27,11 +27,18 @@ if (
     exit();
 }
 
+// Поисковый запрос
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+
+// Устанавливает временную зону пользователя
+date_default_timezone_set($user['timezone']);
+db_set_time_zone($link, $user['timezone']);
+
 // Массив проектов
 $projects = db_get_projects($link, $user['id'], $current_filter, $show_completed_tasks);
 
 // Масив задач
-$tasks = db_get_tasks($link, $user['id'], $current_project_id, $current_filter, $show_completed_tasks);
+$tasks = db_get_tasks($link, $user['id'], $current_project_id, $current_filter, $show_completed_tasks, $search);
 
 $page_content = include_template('main.php', [
     'projects' => $projects,
@@ -41,6 +48,7 @@ $page_content = include_template('main.php', [
     'current_filter' => $current_filter,
     'file_path' => $config['user_files_path'],
     'show_completed_tasks' => $show_completed_tasks,
+    'search' => $search,
 ]);
 $layout_content = include_template('layout.php', [
     'title' => $config['sitename'],

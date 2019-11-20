@@ -227,13 +227,17 @@ a:focus {
   align-items: center;
 }
 
-.user-menu__data p {
-  margin: 3px 0 2px;
-}
-
 .user-menu__data a {
   font-size: 13px;
   color: #9fa4af;
+}
+
+.user-menu__data .user-menu__name {
+  display: block;
+  margin: 3px 0 2px;
+
+  font: inherit;
+  color: inherit;
 }
 
 .user-menu__data a:active {
@@ -484,26 +488,6 @@ a:focus {
 .checkbox__input:focus + .checkbox__text {
   outline: thin dotted;
   outline: 5px auto -webkit-focus-ring-color;
-}
-
-.tasks-msg {
-  position: relative;
-
-  padding: 20px 20px 20px 40px;
-
-  background: #f0f1f5;
-}
-
-.tasks-msg::before {
-  content: "";
-  position: absolute;
-  top: 21px;
-  left: 15px;
-
-  width: 16px;
-  height: 16px;
-
-  background-image: url("../img/icon-info.png");
 }
 
 .tasks {
@@ -790,4 +774,24 @@ a:focus {
 
 .welcome__text p {
   margin: 20px 0;
+}
+
+.msg {
+  position: relative;
+
+  padding: 20px 20px 20px 40px;
+
+  background: #f0f1f5;
+}
+
+.msg::before {
+  content: "";
+  position: absolute;
+  top: 21px;
+  left: 15px;
+
+  width: 16px;
+  height: 16px;
+
+  background-image: url("../img/icon-info.png");
 }

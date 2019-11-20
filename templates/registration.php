@@ -28,11 +28,23 @@
             <p class="form__message"><?= $errors['name']; ?></p>
             <?php endif; ?>
         </div>
+        <div class="form__row">
+            <label class="form__label" for="timezone">Часовой пояс <sup>*</sup></label>
+            <select class="form__input form__input--select<?= isset($errors['timezone']) ? ' form__input--error' : ''; ?>" name="timezone" id="timezone">
+                <option value="" selected disabled>Выберите часовой пояс</option>
+                <?php foreach ($timezones as $key => $value): ?>
+                <option value="<?= $key; ?>" <?= (!empty($data['timezone']) && $data['timezone'] === $key) ? 'selected' : ''; ?>><?= $value; ?></option>
+                <?php endforeach; ?>
+            </select>
+            <?php if (isset($errors['timezone'])): ?>
+            <p class="form__message"><?= $errors['timezone']; ?></p>
+            <?php endif; ?>
+        </div>
         <div class="form__row form__row--controls">
             <?php if (!empty($errors)): ?>
             <p class="error-message">Пожалуйста, исправьте ошибки в форме</p>
             <?php endif; ?>
-            <input class="button" type="submit" name="submit" value="Зарегистрироваться">
+            <input class="button" type="submit" value="Зарегистрироваться">
         </div>
     </form>
 </main>

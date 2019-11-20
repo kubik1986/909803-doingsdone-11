@@ -24,7 +24,7 @@
                         <a class="main-header__side-item button button--plus open-modal" href="add-task.php">Добавить задачу</a>
                         <div class="main-header__side-item user-menu">
                             <div class="user-menu__data">
-                                <p><?= htmlspecialchars($user['name']); ?></p>
+                                <a class="user-menu__name" href="profile.php"><?= htmlspecialchars($user['name']); ?></a>
                                 <a href="logout.php">Выйти</a>
                             </div>
                         </div>

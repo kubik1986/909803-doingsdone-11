@@ -1,5 +1,21 @@
 <?php
 /**
+ * Устанавливает временную зону для сеанса подключения к БД.
+ *
+ * @param mysqli $link     Ресурс соединения
+ * @param string $timezone Идентификатор временной зоны
+ */
+function db_set_time_zone(mysqli $link, string $timezone): void
+{
+    $sql = "SET time_zone = '".$timezone."'";
+    $result = mysqli_query($link, $sql);
+
+    if (!$result) {
+        exit('Произошла ошибка MySQL. Попробуйте повторить позднее или обратитесь к администратору.');
+    }
+}
+
+/**
  * Создает подключение к сервру MySQL и возвращает идентификатор подключения.
  *
  * @param array $db Массив с параметрами подключения
@@ -10,10 +26,9 @@ function db_connect(array $db): mysqli
 {
     $link = mysqli_connect($db['host'], $db['user'], $db['password'], $db['database']);
     if ($link) {
-        $sql = "SET time_zone = '".$db['timezone']."'";
-        $set_time_zone = mysqli_query($link, $sql);
+        db_set_time_zone($link, $db['timezone']);
     }
-    if (!$link || !$set_time_zone) {
+    if (!$link) {
         exit('Произошла ошибка MySQL. Попробуйте повторить позднее или обратитесь к администратору.');
     }
 
@@ -107,6 +122,27 @@ function db_insert_data(mysqli $link, string $sql, array $data = []): int
 }
 
 /**
+ * Обновляет запись в БД.
+ *
+ * @param mysqli $link Ресурс соединения
+ * @param string $sql  SQL запрос с плейсхолдерами вместо значений
+ * @param array  $data Данные для вставки на место плейсхолдеров
+ *
+ * @return bool true - данные успешно оновлены, false - данные не обновлены
+ */
+function db_update_data(mysqli $link, string $sql, array $data = []): bool
+{
+    $result = [];
+    $stmt = db_get_prepare_stmt($link, $sql, $data);
+    $result = mysqli_stmt_execute($stmt);
+    if (!$result) {
+        exit('Произошла ошибка MySQL. Попробуйте повторить позднее или обратитесь к администратору.');
+    }
+
+    return $result;
+}
+
+/**
  * Проверяет, существует ли указанный проект (по id или названию) у определенного пользователя.
  *
  * @param mysqli $link    Ресурс соединения
@@ -174,13 +210,19 @@ function db_get_projects(mysqli $link, int $user_id, string $task_filter = 'all'
  * @param int    $project_id           Идентификатор проекта
  * @param int    $filter               Имя фильтра срочности задачи
  * @param int    $show_completed_tasks Фильтр статуса выполнения задачи: 1 - показывать выполненные задачи, 0 - не показывать выполненные задачи
+ * @param string $search               Строка поискового запроса
  *
  * @return array Массив задач
  */
-function db_get_tasks(mysqli $link, int $user_id, ?int $project_id = null, string $filter = 'all', int $show_completed_tasks = 0): array
+function db_get_tasks(mysqli $link, int $user_id, ?int $project_id = null, string $filter = 'all', int $show_completed_tasks = 0, string $search = ''): array
 {
     $data = [$user_id];
     $project_select = '';
+    $search_select = '';
+    if (!empty($search)) {
+        $search_select = 'AND MATCH (title) AGAINST (? IN BOOLEAN MODE)';
+        $data[] = $search;
+    }
     if (!empty($project_id)) {
         $project_select = 'AND project_id = ?';
         $data[] = $project_id;
@@ -203,7 +245,7 @@ function db_get_tasks(mysqli $link, int $user_id, ?int $project_id = null, strin
     $sql =
         "SELECT id, title, deadline, is_completed, file_link, file_name, project_id
             FROM tasks
-            WHERE author_id = ? $project_select $filter_select $is_completed_select
+            WHERE author_id = ? $search_select $project_select $filter_select $is_completed_select
             ORDER BY deadline IS NULL, deadline ASC";
 
     return db_fetch_data($link, $sql, $data);
@@ -297,8 +339,26 @@ function db_get_user(mysqli $link, array $where): array
 function db_add_user(mysqli $link, array $data): int
 {
     $sql =
-        'INSERT INTO users (email, password, name)
-            VALUES (?, ?, ?)';
+        'INSERT INTO users (email, password, name, timezone)
+            VALUES (?, ?, ?, ?)';
 
     return db_insert_data($link, $sql, $data);
+}
+
+function db_update_user(mysqli $link, int $user_id, array $data): bool
+{
+    $password_set = '';
+    $stmt_data = [];
+    $stmt_data['name'] = $data['name'];
+    $stmt_data['timezone'] = $data['timezone'];
+    if (!empty($data['password'])) {
+        $password_set = ', password = ?';
+        $stmt_data['password'] = $data['password'];
+    }
+    $sql =
+        "UPDATE users
+            SET name = ?, timezone = ? $password_set
+            WHERE id = $user_id";
+
+    return db_update_data($link, $sql, $stmt_data);
 }

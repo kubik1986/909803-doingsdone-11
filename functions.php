@@ -118,25 +118,3 @@ function build_query(array $new_params): string
 
     return http_build_query(array_replace($params, $new_params));
 }
-
-/**
- * Проверяет, выполнены ли все задачи из указанного массива задач.
- *
- * @param array $tasks Массив задач
- *
- * @return bool true, если массив задач не пустой и все задачи выполнены, иначе false
- */
-function is_all_tasks_completed(array $tasks): bool
-{
-    if (count($tasks) === 0) {
-        return false;
-    }
-
-    foreach ($tasks as $task) {
-        if (!$task['is_completed']) {
-            return false;
-        }
-    }
-
-    return true;
-}
