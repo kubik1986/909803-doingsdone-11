@@ -6,10 +6,9 @@
 <main class="content__main">
     <h2 class="content__main-heading">Список задач</h2>
 
-    <form class="search-form" action="index.php" method="post" autocomplete="off">
-        <input class="search-form__input" type="text" name="" value="" placeholder="Поиск по задачам">
-
-        <input class="search-form__submit" type="submit" name="" value="Искать">
+    <form class="search-form" action="index.php" method="get">
+        <input class="search-form__input" type="text" name="search" value="<?= $search; ?>" placeholder="Поиск по задачам">
+        <input class="search-form__submit" type="submit" value="Искать">
     </form>
 
     <div class="tasks-controls">
@@ -25,7 +24,9 @@
         </label>
     </div>
 
-    <?php if (count($tasks) === 0): ?>
+    <?php if (!empty($search) && count($tasks) === 0): ?>
+    <p class="msg">По вашему запросу ничего не найдено</p>
+    <?php elseif (count($tasks) === 0): ?>
     <p class="msg">Задачи не найдены</p>
     <?php else: ?>
     <table class="tasks">

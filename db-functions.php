@@ -210,13 +210,19 @@ function db_get_projects(mysqli $link, int $user_id, string $task_filter = 'all'
  * @param int    $project_id           Идентификатор проекта
  * @param int    $filter               Имя фильтра срочности задачи
  * @param int    $show_completed_tasks Фильтр статуса выполнения задачи: 1 - показывать выполненные задачи, 0 - не показывать выполненные задачи
+ * @param string $search               Строка поискового запроса
  *
  * @return array Массив задач
  */
-function db_get_tasks(mysqli $link, int $user_id, ?int $project_id = null, string $filter = 'all', int $show_completed_tasks = 0): array
+function db_get_tasks(mysqli $link, int $user_id, ?int $project_id = null, string $filter = 'all', int $show_completed_tasks = 0, string $search = ''): array
 {
     $data = [$user_id];
     $project_select = '';
+    $search_select = '';
+    if (!empty($search)) {
+        $search_select = 'AND MATCH (title) AGAINST (? IN BOOLEAN MODE)';
+        $data[] = $search;
+    }
     if (!empty($project_id)) {
         $project_select = 'AND project_id = ?';
         $data[] = $project_id;
@@ -239,7 +245,7 @@ function db_get_tasks(mysqli $link, int $user_id, ?int $project_id = null, strin
     $sql =
         "SELECT id, title, deadline, is_completed, file_link, file_name, project_id
             FROM tasks
-            WHERE author_id = ? $project_select $filter_select $is_completed_select
+            WHERE author_id = ? $search_select $project_select $filter_select $is_completed_select
             ORDER BY deadline IS NULL, deadline ASC";
 
     return db_fetch_data($link, $sql, $data);
