@@ -7,13 +7,38 @@ if (empty($user)) {
     exit();
 }
 
-// показывать или нет выполненные задачи
+// Обновление статуса задачи
+if (!empty($_GET['complete_task'])) {
+    $request = trim($_GET['complete_task']);
+    $request = explode('_', $request);
+
+    if (count($request) === 2) {
+        $task_id = intval($request[0]);
+        $status = intval($request[1]) >= 1 ? 1 : 0;
+
+        if (db_is_task_exist($link, $user['id'], $task_id)) {
+            db_update_task_status($link, $task_id, $status);
+        } else {
+            show_error('404', 'По вашему запросу ничего не найдено.', $user, $config['sitename']);
+            exit();
+        }
+    }
+
+    $location = '/';
+    if (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], 'http://'.$_SERVER['SERVER_NAME']) === 0) {
+        $location = $_SERVER['HTTP_REFERER'];
+    }
+    header("Location: $location");
+    exit();
+}
+
+// Показывать или нет выполненные задачи
 $show_completed_tasks = intval($_GET['show_completed'] ?? 0);
 
-// id текущего проекта
+// ID текущего проекта
 $current_project_id = isset($_GET['project_id']) ? intval($_GET['project_id']) : null;
 
-// фильтр задач
+// Фильтр задач
 $filters = $config['filters'];
 $current_filter = $_GET['filter'] ?? array_keys($filters)[0];
 if (

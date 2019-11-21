@@ -165,6 +165,26 @@ function db_is_project_exist(mysqli $link, int $user_id, array $where): bool
 }
 
 /**
+ * Проверяет, существует ли указанная задача (по id) у определенного пользователя.
+ *
+ * @param mysqli $link    Ресурс соединения
+ * @param int    $user_id Идентификатор пользователя
+ * @param array  $task_id Идентификатор задачи
+ *
+ * @return bool true, если задача существует у пользователя, иначе false
+ */
+function db_is_task_exist(mysqli $link, int $user_id, int $task_id): bool
+{
+    $sql =
+        "SELECT *
+            FROM tasks
+            WHERE id = ? AND author_id = $user_id";
+    $project = db_fetch_data($link, $sql, [$task_id]);
+
+    return count($project) !== 0;
+}
+
+/**
  * Получает список проектов указанного пользователя с подсчетом количества задач в каждом проекте c учетом фильтрации задач по срочности и статуса выполнения.
  *
  * @param mysqli $link                 Ресурс соединения
@@ -345,6 +365,15 @@ function db_add_user(mysqli $link, array $data): int
     return db_insert_data($link, $sql, $data);
 }
 
+/**
+ * Обновляет данные пользователя в БД.
+ *
+ * @param mysqli $link    Ресурс соединения
+ * @param int    $user_id Идентификатор пользователя
+ * @param array  $data    Массив данных пользователя
+ *
+ * @return bool true, если данные успешно обновлены, иначе false
+ */
 function db_update_user(mysqli $link, int $user_id, array $data): bool
 {
     $password_set = '';
@@ -361,4 +390,41 @@ function db_update_user(mysqli $link, int $user_id, array $data): bool
             WHERE id = $user_id";
 
     return db_update_data($link, $sql, $stmt_data);
+}
+
+/**
+ * Инвертирует статус выполнения задачи.
+ *
+ * @param mysqli $link    Ресурс соединения
+ * @param int    $task_id Идентификатор задачи
+ *
+ * @return bool true, если статус успешно обновлен, иначе false
+ */
+function db_invert_task_status(mysqli $link, int $task_id): bool
+{
+    $sql =
+        'UPDATE tasks
+            SET is_completed = NOT is_completed
+            WHERE id = ?';
+
+    return db_update_data($link, $sql, [$task_id]);
+}
+
+/**
+ * Обновляет статус выполнения задачи.
+ *
+ * @param mysqli $link        Ресурс соединения
+ * @param int    $task_id     Идентификатор задачи
+ * @param int    $task_status Статус выполнения задачи (0 или 1)
+ *
+ * @return bool true, если статус успешно обновлен, иначе false
+ */
+function db_update_task_status(mysqli $link, int $task_id, int $task_status): bool
+{
+    $sql =
+        'UPDATE tasks
+            SET is_completed = ?
+            WHERE id = ?';
+
+    return db_update_data($link, $sql, [$task_status, $task_id]);
 }
