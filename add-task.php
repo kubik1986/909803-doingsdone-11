@@ -56,6 +56,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') { // Если была отправл
 
     if (isset($_FILES['file']) && is_uploaded_file($_FILES['file']['tmp_name'])) {
         $rules['file'] = [
+            'validate_file_mime' => [
+                $_FILES['file'],
+                $config['forms_limits']['mime_types'],
+            ],
             'validate_file_size' => [
                 $_FILES['file'],
                 $config['forms_limits']['max_file_size'],

@@ -134,6 +134,26 @@ function validate_date_in_past(string $date): ?string
 }
 
 /**
+ * Проверяет корректность формата файла.
+ *
+ * @param array $file       Массив данных файла из глобального массива $_POST
+ * @param int   $mime_types Массив допустимых mime-типов файла
+ *
+ * @return string Строка сообщения об ошибке, если mime-тип загруженного файла не присутствует в массиве допустимых
+ */
+function validate_file_mime(array $file, array $mime_types): ?string
+{
+    $file_type = mime_content_type($file['tmp_name']);
+    if (!key_exists($file_type, $mime_types)) {
+        $types = implode(', ', array_values($mime_types));
+
+        return "Файл имеет недопустимый формат. Допустимые форматы: $types";
+    }
+
+    return null;
+}
+
+/**
  * Проверяет размер загружаемого файла.
  *
  * @param array $file          Массив данных файла из глобального массива $_POST
